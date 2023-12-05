@@ -7,21 +7,21 @@ from keyphrase_vectorizers import KeyphraseCountVectorizer
 from transformers.pipelines import pipeline
 from flair.embeddings import TransformerDocumentEmbeddings, WordEmbeddings, DocumentPoolEmbeddings
 from better_profanity import profanity
-import spacy
+#import spacy
 
 #loading landguage models
 kw_model3 = KeyBERT(model='all-mpnet-base-v2')
 hf_model = pipeline(task = "feature-extraction", model="distilbert-base-cased")
 kw_model4 = KeyBERT(model=hf_model)
-spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
-kw_model5 = KeyBERT(model=spacy_model)
+#spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
+#kw_model5 = KeyBERT(model=spacy_model)
 # header
 st.title(':blue[Keyphrase Extractor - Qodequay]')
 
 # Model input
 model = st.selectbox(
     'Select a model for keyphrase extraction',
-    ('KW_Gen1', 'KW_Gen2','KW_Gen3','KW_Gen4','KW_Gen5'))
+    ('KW_Gen1', 'KW_Gen2','KW_Gen3','KW_Gen4'))
 
 def clear_text():
     st.session_state["text"] = ""
