@@ -1,11 +1,11 @@
-torch
-transformers
-streamlit
-yake
+torch==2.1.1
+transformers==4.35.2
+streamlit==1.29.0
+yake==0.4.8
 multi_rake
-keybert
-keyphrase_vectorizers
-flair
-better_profanity
-spacy>=3.0.0,<4.0.0
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.4.0/en_core_web_sm-3.4.0-py3-none-any.whl
+keybert==0.8.3
+keyphrase_vectorizers==0.0.11
+flair==0.13.0
+better_profanity==0.7.0
+spacy==3.7.2
+pip install $(spacy info en_core_web_sm --url)
