@@ -13,15 +13,7 @@ import spacy
 kw_model3 = KeyBERT(model='all-mpnet-base-v2')
 hf_model = pipeline(task = "feature-extraction", model="distilbert-base-cased")
 kw_model4 = KeyBERT(model=hf_model)
-try:
-    spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
-except OSError:
-    print('Downloading language model for the spaCy POS tagger\n'
-        "(don't worry, this will only happen once)", file=stderr)
-    from spacy.cli import download
-    download('en')
-    spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
-#spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
+spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
 kw_model5 = KeyBERT(model=spacy_model)
 # header
 st.title(':blue[Keyphrase Extractor - Qodequay]')
