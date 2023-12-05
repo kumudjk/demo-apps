@@ -1,51 +1,82 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import streamlit as st
-from streamlit.logger import get_logger
+import re
+import yake
+from multi_rake import Rake
+from keybert import KeyBERT
+from keyphrase_vectorizers import KeyphraseCountVectorizer
+from transformers.pipelines import pipeline
+from flair.embeddings import TransformerDocumentEmbeddings, WordEmbeddings, DocumentPoolEmbeddings
+from better_profanity import profanity
+import spacy
 
-LOGGER = get_logger(__name__)
+#loading landguage models
+kw_model3 = KeyBERT(model='all-mpnet-base-v2')
+hf_model = pipeline(task = "feature-extraction", model="distilbert-base-cased")
+kw_model4 = KeyBERT(model=hf_model)
+spacy_model = spacy.load("en_core_web_md", exclude=['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'])
+kw_model5 = KeyBERT(model=spacy_model)
+# header
+st.title(':blue[Keyphrase Extractor - Qodequay]')
 
+# Model input
+model = st.selectbox(
+    'Select a model for keyphrase extraction',
+    ('KW_Gen1', 'KW_Gen2','KW_Gen3','KW_Gen4','KW_Gen5'))
 
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
+def clear_text():
+    st.session_state["text"] = ""
 
-    st.write("# Welcome to Streamlit! 👋")
+# Paragraph input
+input_paragraph = st.text_area("Input Paragraph: ",key="text")
+st.button("Clear", on_click=clear_text)
+max_words = st.number_input("Max words in a keyphrase: ", min_value=1, max_value=4, step=1, value=2)
+no_of_keywords = st.number_input("Number of keyprases required: ", min_value=3, max_value=12, step=1, value = 6)
+input_paragraph = re.sub(r"[^a-zA-Z0-9 ]", "", input_paragraph)
+input_paragraph = profanity.censor(input_paragraph,'')
 
-    st.sidebar.success("Select a demo above.")
+if input_paragraph:
+    if model == 'KW_Gen1':
+        kw_extractor = yake.KeywordExtractor(lan="en", n=max_words, dedupLim=0.5, dedupFunc="seqm", windowsSize=1, top=no_of_keywords, features=None, stopwords=None)
+        keywords = kw_extractor.extract_keywords(input_paragraph)
+        kw_list = []
+        for kw, v in keywords:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))
+    if model == 'KW_Gen2':
+        rake = Rake(max_words=max_words)
+        keywords = rake.apply(input_paragraph)
+        kw_list = []
+        for kw, v in keywords[:no_of_keywords]:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))
+    if model == 'KW_Gen3':
+        keywords = kw_model3.extract_keywords(input_paragraph, top_n=no_of_keywords, keyphrase_ngram_range=(1, max_words), diversity=0.5, use_mmr=True, stop_words="english",highlight=False)
+        kw_list = []
+        for kw, v in keywords[:no_of_keywords]:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))
+    if model == 'KW_Gen4':
+        keywords = kw_model4.extract_keywords(input_paragraph, top_n=no_of_keywords, keyphrase_ngram_range=(1, max_words), diversity=0.5, use_mmr=True, stop_words="english",highlight=False)
+        kw_list = []
+        for kw, v in keywords[:no_of_keywords]:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))
+    if model == 'KW_Gen5':
+        keywords = kw_model5.extract_keywords(input_paragraph, top_n=no_of_keywords, keyphrase_ngram_range=(1, max_words), diversity=0.5, use_mmr=True, stop_words="english",highlight=False)
+        kw_list = []
+        for kw, v in keywords[:no_of_keywords]:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))           
+    if model == 'KW_Gen6':
+        keywords = kw_model6.extract_keywords(input_paragraph, top_n=no_of_keywords, keyphrase_ngram_range=(1, max_words), diversity=0.5, use_mmr=True, stop_words="english",highlight=False)
+        kw_list = []
+        for kw, v in keywords[:no_of_keywords]:
+            kw_list.append(kw)
+        # Display the keywords
+        st.write("Keyphrases List: ", " ; ".join(kw_list))
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
-
-
-if __name__ == "__main__":
-    run()
