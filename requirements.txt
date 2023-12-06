@@ -2,3 +2,4 @@ streamlit
 chromadb
 openpyxl
 uuid
+sqlite3 >= 3.35.0
