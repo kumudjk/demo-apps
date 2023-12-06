@@ -9,6 +9,9 @@ from chromadb.utils import embedding_functions
 import csv
 import uuid
 #openpyxl
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 data = pd.read_excel('Dr Mix Chatbot Q&A.xlsx', sheet_name='Sheet1')
 data_x=data[['Question','Answer']].drop_duplicates().to_dict('records')
